@@ -2088,6 +2088,9 @@ FOR LOCAL, 0, CHARANUM
 	ENDIF
 	CALL 処女童貞適用処理(LOCAL)
 
+	;舌、指、腰使いのUP
+	CALL SOURCE_ABLUP(LOCAL)
+
 	;性癖開拓のリセット
 	IF OPTION変数:性癖開拓自動継続 == 0
 		性癖素質:LOCAL:性癖開発用フラグ変数 = 0

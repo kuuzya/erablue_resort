@@ -71,6 +71,10 @@ RETURN RESULT
 ;    RETURNF 1
 ;*****************************************************************
 
+;キャラ登録可能数が限界近いなら一律禁止
+SIF CHARANUM > キャラクタ数上限 - 100
+	RETURNF 1
+
 ;直前の行動が時間が経過しないコマンドの場合は処理をスキップ
 SIF !TIME_PROGRESS(TFLAG:行動前時刻)
 	RETURNF 1
@@ -144,12 +148,21 @@ NEXT
 ;興味の場合は1時間、愛好の場合は30分、中毒の場合は15分毎にそれぞれ判定を発生させる
 SELECTCASE 性癖素質:ARG:ゆきずりセックス
 	CASE 1
+		;一日１回まで
+		SIF TCVAR:ARG:ゆきずりセックス_一日回数 >= 1
+			RETURNF 1
 		SIF TCVAR:ARG:ゆきずりセックス_終了時刻 + 1 * 60 > NOW()
 			RETURNF 1
 	CASE 2
+		;一日１回まで
+		SIF TCVAR:ARG:ゆきずりセックス_一日回数 >= 1
+			RETURNF 1
 		SIF TCVAR:ARG:ゆきずりセックス_終了時刻 + 1 * 30 > NOW()
 			RETURNF 1
 	CASE 3
+		;中毒は一日３回まで
+		SIF TCVAR:ARG:ゆきずりセックス_一日回数 >= 3
+			RETURNF 1
 		SIF TCVAR:ARG:ゆきずりセックス_終了時刻 + 1 * 15 > NOW()
 			RETURNF 1
 ENDSELECT

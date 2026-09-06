@@ -997,7 +997,12 @@ FOR LOCAL, 0, 分身最大数
 	FOR EXP番号, 0, 200
 		EXP:(分身登録:LOCAL:1):EXP番号 += EXP:(分身登録:LOCAL:0):EXP番号 - 分身EXP保存:LOCAL:EXP番号
 	NEXT
-	DELCHARA 分身登録:LOCAL:0
+	;DELCHARA 分身登録:LOCAL:0
+
+	;一日終了時にまとめて消すので異空間に幽閉
+	CFLAG:(分身登録:LOCAL:0):滞在期間 = -1
+	CFLAG:(分身登録:LOCAL:0):現在位置 = 999
+	CFLAG:(分身登録:LOCAL:0):現在マップ種別 = 0
 NEXT
 VARSET 分身登録:0:0
 VARSET 分身EXP保存:0:0
@@ -1022,7 +1027,12 @@ NEXT
 FOR EXP番号, 0, 200
 	EXP:(分身登録:分身番号:1):EXP番号 += EXP:(分身登録:分身番号:0):EXP番号 - 分身EXP保存:分身番号:EXP番号
 NEXT
-DELCHARA 対象キャラ
+; DELCHARA 対象キャラ
+
+;一日終了時にまとめて消すので異空間に幽閉
+CFLAG:(分身登録:LOCAL:0):滞在期間 = -1
+CFLAG:(分身登録:LOCAL:0):現在位置 = 999
+CFLAG:(分身登録:LOCAL:0):現在マップ種別 = 0
 
 ;キャラ番号をズラしておく
 FOR LOCAL, 0, 分身最大数
@@ -1038,6 +1048,24 @@ FOR LOCAL, 分身番号, 分身最大数 - 1
 NEXT
 CALL SORT_CHARALIST()
 CALL TARGET_SET()
+
+
+
+@一日終了時_分身削除()
+#DIM 消去実行フラグ
+消去実行フラグ = 0
+
+;生成NPC本人をキャラ番号の降順で削除
+FOR LOCAL, CHARANUM - 1, -1, -1
+	IF TALENT:LOCAL:分身 > 0
+		DELCHARA LOCAL
+		消去実行フラグ = 1
+	ENDIF
+NEXT
+
+IF 消去実行フラグ
+	CALL SORT_CHARALIST()
+ENDIF
 
 
 

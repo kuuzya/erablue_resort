@@ -42,6 +42,9 @@ ENDIF
 SIF NPC性別 == TALENT:ARG:火遊び抑制
 	RETURN 0
 
+;一日の回数を記録
+TCVAR:ARG:ゆきずりセックス_一日回数 ++
+
 ;問題がなければNPCを作成
 CALL ゆきずりセックス_NPC作成(ARG, NPC性別)
 
@@ -306,6 +309,8 @@ IF !CFLAG:ARG:うふふ
 	;うふふじゃないなら全てのモードを消す
 	CALL 特定キャラモードリセット(ARG)
 ENDIF
+;ゆきずり相手のモードを全て消す
+CALL 特定キャラモードリセット(相手キャラ)
 
 ;覗きバレフラグを消す
 TCVAR:ARG:覗きバレ = 0

@@ -379,8 +379,19 @@ SELECTCASE LOCAL
 		RETURN 0
 	CASE 100
 		CALL 料理エディタ_発動タイミング変更(発動タイミング)
+		IF RESULTS != 発動タイミング
+			発動タイミング '= RESULTS
+			発動先効果 = 
+			発動効果量 = 
+		ENDIF
 	CASE 200
+		CALL 料理エディタ_発動先効果変更(発動先効果, 発動タイミング)
+		IF RESULTS != 発動先効果
+			発動先効果 '= RESULTS
+			発動効果量 = 
+		ENDIF
 	CASE 300
+		CALL 料理エディタ_発動効果量変更(発動効果量, 発動先効果)
 ENDSELECT
 
 GOTO 動作ループ
@@ -392,7 +403,76 @@ GOTO 動作ループ
 @料理エディタ_発動タイミング変更(発動タイミング)
 #DIMS 発動タイミング
 
+RESULTS = 
+
+DRAWLINE
+PRINTL 料理効果が発動するタイミングを選択してください。
+PRINT 現在の設定：
+IF 発動タイミング != ""
+	PRINTFORM %発動タイミング%
+ELSE
+	PRINT なし
+ENDIF
+PRINTL
+DRAWLINE
+
+PRINTL
+PRINTBUTTON "[0] メニューによる収入算出時", 0
+PRINTL
+PRINTBUTTON "[1] 装備ステータス算出時", 1
+PRINTL
+PRINTBUTTON "[2] 戦闘勝利時", 2
+PRINTL
+PRINTL
+PRINTL
+
+BINPUT
+SELECTCASE RESULT
+	CASE 0
+		RESULTS = メニューによる収入算出時
+	CASE 1
+		RESULTS = 装備ステータス算出時
+	CASE 2
+		RESULTS = 戦闘勝利時
+ENDSELECT
+
+@料理エディタ_発動先効果変更(発動先効果, 発動タイミング)
+#DIMS 発動先効果
+#DIMS 発動タイミング
+
+DRAWLINE
+PRINTL 料理効果の内容を選択してください。
+PRINT 現在の設定：
+IF 発動先効果 != ""
+	PRINTFORM %発動先効果%
+ELSE
+	PRINT なし
+ENDIF
+PRINTL
+DRAWLINE
+
+SELECTCASE 発動タイミング
+	CASE "メニューによる収入算出時"
+		PRINTL
+		PRINTBUTTON "[0] ルピ収入増加", 0
+		PRINTL
+		PRINTBUTTON "[1] ZP収入増加", 1
+		PRINTL
+		PRINTL
+		PRINTL
+	CASE "装備ステータス算出時"
+		PRINTL
+		PRINTBUTTON "[10] ルピ収入増加", 10
+		PRINTL
+		PRINTBUTTON "[11] ZP収入増加", 11
+		PRINTL
+		PRINTL
+		PRINTL
+	CASE "戦闘勝利時"
+ENDSELECT
 
 
 
-
+@料理エディタ_発動効果量変更(発動効果量, 発動先効果)
+#DIMS 発動先効果
+#DIMS REF 発動効果量
