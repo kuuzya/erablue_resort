@@ -44,6 +44,11 @@ REDRAW 0
 PRINTL ロード時対応中…
 
 
+;この時点で分身・ゆきずりがいる場合は消す
+CALL ゆきずりセックス_NPC消去()
+CALL 一日終了時_分身削除()
+
+
 ;CSVが存在しない場合のフォロー
 FOR LOCAL, 0, CHARANUM
 	SIF LOCAL >= CHARANUM
