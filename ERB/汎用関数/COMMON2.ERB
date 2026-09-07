@@ -1147,14 +1147,21 @@ RETURNF CSVNAME(NO:対象キャラ) == キャラNAME
 
 @キャラ検索(キャラNAME)
 #FUNCTION
-#DIM 対象キャラ
+#DIMS 登録番号
 #DIMS キャラNAME
 
-FOR 対象キャラ, 0, CHARANUM
-	SIF キャラ一致チェック(対象キャラ, キャラNAME)
-		RETURNF 対象キャラ
-NEXT
-RETURNF -1
+登録番号 '= MAP_GET("キャラ検索", キャラNAME)
+IF ISNUMERIC(登録番号)
+	RETURNF TOINT(登録番号)
+ELSE
+	RETURNF -1
+ENDIF
+
+; FOR 対象キャラ, 0, CHARANUM
+; 	SIF キャラ一致チェック(対象キャラ, キャラNAME)
+; 		RETURNF 対象キャラ
+; NEXT
+; RETURNF -1
 
 @滞在キャラランダム選出(除外キャラ)
 #FUNCTION

@@ -357,3 +357,14 @@ DT_CREATE "ランダムCSVデータベース"
 DT_COLUMN_ADD "ランダムCSVデータベース", "CSV番号", 3
 DT_COLUMN_ADD "ランダムCSVデータベース", "ランダムキャラ設定"
 DT_COLUMN_ADD "ランダムCSVデータベース", "フリー文字列１"
+
+@キャラ検索マップセット
+#DIM 対象キャラ
+MAP_CREATE "キャラ検索"
+
+FOR 対象キャラ, 1, CHARANUM
+	SIF ランダムキャラ判定(NO:対象キャラ)
+		CONTINUE
+	MAP_SET "キャラ検索", CSVNAME(NO:対象キャラ), @"{対象キャラ}"
+NEXT
+
