@@ -186,6 +186,11 @@ IF GETMETH(@"固有COMABLE_プレイヤー側_%ARGS%_{NO:PLAYER}", 1, PLAYER) ==
 	RESULT = 0
 	RETURNF 1
 ENDIF
+;ゆきずり覗き・使い魔覗き中は派生コマンドも使用不可
+IF ゆきずり覗き中？(TARGET) || CFLAG:MASTER:使い魔覗き状態
+	RESULT = 0
+	RETURNF 1
+ENDIF
 
 ;外出時条件
 IF FLAG:外出先番号 > 0

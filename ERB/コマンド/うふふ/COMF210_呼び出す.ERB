@@ -467,6 +467,9 @@ RETURN 1
 ;呼び出す
 SIF SAVESTR:ゲームフェイズ管理 != "通常モード"
 	RETURN 0
+;ゆきずり覗き・使い魔覗き中は使用不可
+SIF ゆきずり覗き中？(TARGET) || CFLAG:MASTER:使い魔覗き状態
+	RETURN 0
 ;複数人プレイに入るためのコマンドのため、一括管理はせずここで全部記述する
 SELECTCASE TFLAG:調教モード
 	CASE 0, 1

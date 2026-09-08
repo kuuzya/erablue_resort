@@ -237,6 +237,24 @@ ENDIF
 ;体位モードを更新
 CALL MODE_CHANGE(プレイ内容, 攻めキャラ, 受けキャラ)
 
+;永続キャラ側の初体験・処女童貞喪失処理
+IF A性交フラグ
+	IF ARG == 受けキャラ
+		CALL LOST_A_VIRGIN(ARG, TALENT:相手キャラ:性別 * -1, 1)
+	ELSEIF ARG == 攻めキャラ
+		CALL LOST_MAN_A_VIRGIN(ARG, -1)
+	ENDIF
+ELSE
+	IF ARG == 受けキャラ
+		CALL LOST_VIRGIN(ARG, TALENT:相手キャラ:性別 * -1, 1)
+	ELSEIF ARG == 攻めキャラ
+		CALL LOST_MAN_VIRGIN(ARG, -1)
+	ENDIF
+ENDIF
+
+;RCVARの喪失記録をTALENT・履歴へ即時反映
+CALL 処女童貞適用処理(ARG)
+
 
 
 ;==================================================================================================
@@ -260,6 +278,8 @@ TCVAR:ARG:ゆきずりセックス_射精完了 = 0
 ;キャラ同士うふふフラグを立てる
 CFLAG:ARG:キャラ同士うふふ = 1
 CFLAG:相手キャラ:キャラ同士うふふ = 1
+;終了理由フラグを初期化
+TCVAR:ARG:ゆきずりセックス_終了理由 = 0
 
 ;V性交の場合
 CALL ゆきずりセックス内容決定(ARG,相手キャラ)
@@ -543,20 +563,38 @@ SIF スケジュール状態:ARG:状況 == スケジュール_終了中
 SIF !GROUPMATCH(スケジュール名, "その場でゆきずりセックス", "自室でゆきずりセックス")
 	RETURN
 
+相手キャラ = TCVAR:ARG:ゆきずりセックス_相手キャラID
+
+;キャラ側が体力切れ
+IF BASE:ARG:体力 <= 0 || CFLAG:ARG:体力限界
+	TCVAR:ARG:ゆきずりセックス_終了理由 = 1
+	スケジュール状態:ARG:状況 = スケジュール_終了中
+	スケジュール状態:ARG:終了予定時間 = TIME
+	RETURN
+ENDIF
+
+;NPC側が体力切れ
+IF 相手キャラ > 0 && 相手キャラ < CHARANUM
+	IF BASE:相手キャラ:体力 <= 0 || CFLAG:相手キャラ:体力限界
+		TCVAR:ARG:ゆきずりセックス_終了理由 = 2
+		スケジュール状態:ARG:状況 = スケジュール_終了中
+		スケジュール状態:ARG:終了予定時間 = TIME
+		RETURN
+	ENDIF
+ENDIF
 
 ;まだ規定時間内
 SIF TIME < スケジュール状態:ARG:終了予定時間
 	RETURN
 
-相手キャラ = TCVAR:ARG:ゆきずりセックス_相手キャラID
 攻めキャラ = ゆきずりセックス_現在射精側取得(ARG, 相手キャラ)
 
 ;射精側を取得できないプレイは通常終了
 SIF 攻めキャラ < 0
 	RETURN
 
-;射精不能なら通常終了
-SIF !射精可能(攻めキャラ)
+;射精不能、または精力切れなら通常終了
+SIF !射精可能(攻めキャラ) || BASE:攻めキャラ:精力 <= 0
 	RETURN
 
 ;射精待ちに入った後、射精が完了していれば終了

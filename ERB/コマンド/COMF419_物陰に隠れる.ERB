@@ -49,15 +49,35 @@ TSTR:ツールチップ受渡 += "<br>固有の取得経験：なし<br>"
 ;===================================================
 @COM419
 #LOCALSIZE 1
+#DIM 遭遇キャラ
+
+;遭遇キャラを初期化
+遭遇キャラ = -1
 
 IF CFLAG:MASTER:隠密 == 0
 	CFLAG:MASTER:隠密 = 1
+	;同行者を隠密状態にする
 	FOR LOCAL, 1, CHARANUM
 		SIF TARGET:LOCAL < 1
 			BREAK
+	
 		SIF CFLAG:(TARGET:LOCAL):同行 || CFLAG:(TARGET:LOCAL):うふふ
 			CFLAG:(TARGET:LOCAL):隠密 = 1
 	NEXT
+	
+	;TARGET一覧を使わず、全キャラからゆきずり中のキャラを探す
+	FOR LOCAL, 0, CHARANUM
+		SIF LOCAL == MASTER
+			CONTINUE
+		IF IS_SAME_ROOM(LOCAL, MASTER) && IS_ゆきずりセックス中(LOCAL) && TCVAR:LOCAL:ゆきずりセックス_相手キャラID > 0
+			遭遇キャラ = LOCAL
+			BREAK
+		ENDIF
+	NEXT
+	
+	SIF 遭遇キャラ >= 0
+		CALL ゆきずりセックス_遭遇処理(遭遇キャラ)
+	
 ELSE
 	;ゆきずり覗き中なら覗かれフラグを解除する
 	SIF IS_ゆきずり覗かれ中(TARGET)

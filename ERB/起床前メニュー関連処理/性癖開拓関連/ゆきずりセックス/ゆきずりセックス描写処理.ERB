@@ -469,79 +469,92 @@ ENDIF
 ;--------------------------------------------------------------------------------------------------
 #DIM 性欲割合
 ;--------------------------------------------------------------------------------------------------
-;性欲の割合を算出
-性欲割合 = (BASE:ARG:性欲 * 100) / MAXBASE:ARG:性欲
-
-IF ゆきずり覗き中？(ARG)
-	PRINTFORML
-	IF TCVAR:ARG:覗きバレ
-		;▼覗きがバレている状態で行為終了
-		SELECTCASE RAND:2
-			CASE 0
-				PRINTFORM 性行為を終えた二人が服を整え始め、%CALLNAME:ARG%もこちらへ目を向けたため、
-			CASE 1
-				PRINTFORM 乱れた衣服を直す傍らで、%CALLNAME:ARG%がこちらを咎めるように見据えたため、
-		ENDSELECT
-	ELSE
-		;▼覗きに気付かれないまま行為終了
-		SELECTCASE RAND:2
-			CASE 0
-				PRINTFORM 性行為の余韻に浸っていた二人が服の乱れを直し始めたため、
-			CASE 1
-				PRINTFORM 二人が余韻を残しながら身支度を始めたのを見届け、
-		ENDSELECT
-	ENDIF
-	IF  使い魔覗き対象？(ARG)
-		PRINTFORMW %CALLNAME:PLAYER%は使い魔との接続を切った。
-	ELSE
-		PRINTFORMW %CALLNAME:PLAYER%は急いでその場を離れた。
-	ENDIF
-	PRINTFORML
-	PRINTFORML
-ENDIF
-
-SETCOLOR カラーパレット("えっちな色")
-
-IF IS_SAME_ROOM(ARG, MASTER)
-	;誘われた側が顔を赤らめる
-	;キャラの描写
-	SIF ゆきずりセックス_本人が誘われた？(ARG)
-		PRINTFORM %TEXTR("顔を赤らめた/蕩けた表情の")%
-	PRINTFORM %CALLNAME:ARG%が
-	
-	;NPCの描写
-	SIF ゆきずりセックス_本人が誘った？(ARG)
-		PRINTFORM %TEXTR("顔を赤らめた/蕩けた表情の")%
-	;
-	IF IS_MALE(TCVAR:ARG:ゆきずりセックス_相手キャラID)
-		PRINTFORM 見知らぬ男
-	ELSE
-		PRINTFORM 見知らぬ女性
-	ENDIF
-	PRINTFORML と物陰から出てきた……。
-	
-	;性欲の割合によって反応が異なる
-	IF 性欲割合 > 60
-		;欲求不満
-		PRINTFORML  ⇒ 満足に発散できなかった%CALLNAME:ARG%は少し不満そうにしている……。
-	ELSEIF 性欲割合 < 30
-		PRINTFORM  ⇒ 
-		;満足
-		IF ゆきずりセックス_本人が誘われた？(ARG)
-			;誘われ
-			PRINTFORM 十分に発散させてもらった
-		ELSE
-			;誘い
-			PRINTFORM たくさん%TEXTR("愛された/求められた")%
+PRINTFORML
+SELECTCASE TCVAR:ARG:ゆきずりセックス_終了理由
+	CASE 1 ;体力切れ終了
+		IF CFLAG:ARG:使い魔対象
+			SETCOLOR カラーパレット("えっちな色")
+			PRINTFORML 《%CALLNAME:ARG%の体力が尽きてしまい、ゆきずりの性交を中断したようだ……》
+			RESETCOLOR
+		ELSEIF  ゆきずり覗き中？(ARG)
+			PRINTFORML 体力が尽き、気絶しかけた%CALLNAME:ARG%をゆきずりの相手は慌てて支えた。
 		ENDIF
-		PRINTFORML %CALLNAME:ARG%は満足そうにしている。
-	ENDIF
-	
-ELSEIF CFLAG:ARG:使い魔対象
-	PRINTFORML 《%CALLNAME:ARG%はゆきずりの性行為を終えたようだ……》
-ENDIF
-
-RESETCOLOR
+	CASE 2 ;NPC体力切れ終了
+		;基本的にはならない
+		
+	CASEELSE ;通常終了
+		;性欲の割合を算出
+		性欲割合 = (BASE:ARG:性欲 * 100) / MAXBASE:ARG:性欲
+		
+		IF ゆきずり覗き中？(ARG)
+			IF TCVAR:ARG:覗きバレ
+				;▼覗きがバレている状態で行為終了
+				SELECTCASE RAND:2
+					CASE 0
+						PRINTFORM 性行為を終えた二人が服を整え始め、%CALLNAME:ARG%もこちらへ目を向けたため、
+					CASE 1
+						PRINTFORM 乱れた衣服を直す傍らで、%CALLNAME:ARG%がこちらを咎めるように見据えたため、
+				ENDSELECT
+			ELSE
+				;▼覗きに気付かれないまま行為終了
+				SELECTCASE RAND:2
+					CASE 0
+						PRINTFORM 性行為の余韻に浸っていた二人が服の乱れを直し始めたため、
+					CASE 1
+						PRINTFORM 二人が余韻を残しながら身支度を始めたのを見届け、
+				ENDSELECT
+			ENDIF
+			IF  使い魔覗き対象？(ARG)
+				PRINTFORMW %CALLNAME:PLAYER%は使い魔との接続を切った。
+			ELSE
+				PRINTFORMW %CALLNAME:PLAYER%は急いでその場を離れた。
+			ENDIF
+			PRINTFORML
+			PRINTFORML
+		ENDIF
+		
+		SETCOLOR カラーパレット("えっちな色")
+		IF IS_SAME_ROOM(ARG, MASTER)
+			;誘われた側が顔を赤らめる
+			;キャラの描写
+			SIF ゆきずりセックス_本人が誘われた？(ARG)
+				PRINTFORM %TEXTR("顔を赤らめた/蕩けた表情の")%
+			PRINTFORM %CALLNAME:ARG%が
+			
+			;NPCの描写
+			SIF ゆきずりセックス_本人が誘った？(ARG)
+				PRINTFORM %TEXTR("顔を赤らめた/蕩けた表情の")%
+			IF IS_MALE(TCVAR:ARG:ゆきずりセックス_相手キャラID)
+				PRINTFORM 見知らぬ男
+			ELSE
+				PRINTFORM 見知らぬ女性
+			ENDIF
+			PRINTFORML と物陰から出てきた……。
+			
+			;性欲の割合によって反応が異なる
+			IF 性欲割合 > 60
+				;欲求不満
+				PRINTFORML  ⇒ 満足に発散できなかった%CALLNAME:ARG%は少し不満そうにしている……。
+			ELSEIF 性欲割合 < 30
+				PRINTFORM  ⇒ 
+				;満足
+				IF ゆきずりセックス_本人が誘われた？(ARG)
+					;誘われ
+					PRINTFORM 十分に発散させてもらった
+				ELSE
+					;誘い
+					PRINTFORM たくさん%TEXTR("愛された/求められた")%
+				ENDIF
+				PRINTFORML %CALLNAME:ARG%は満足そうにしている。
+			ENDIF
+			
+		ELSEIF CFLAG:ARG:使い魔対象
+			PRINTFORML 《%CALLNAME:ARG%はゆきずりの性行為を終えたようだ……》
+		ENDIF
+		RESETCOLOR
+		
+ENDSELECT
+PRINTFORMW
 
 
 
